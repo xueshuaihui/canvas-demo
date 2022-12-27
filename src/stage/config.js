@@ -1,7 +1,6 @@
 export const zoomConfig = {
     min: 0.01,
-    default: 1,
-    max: 20
+    max: 5
 }
 export const brushConfig = {
     minWidth: 1,
@@ -13,4 +12,5 @@ export const eraserConfig = {
 export const stageConfig = {
     selection: false,
     backgroundColor: "#eee",
+    zoom: 0.5
 }

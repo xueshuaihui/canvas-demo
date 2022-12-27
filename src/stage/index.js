@@ -2,7 +2,8 @@ import { stageConfig, zoomConfig, brushConfig, eraserConfig } from "./config";
 import Mouse from "./mouse";
 
 class Stage {
-  constructor() {
+  constructor(el) {
+    this.el = el;
     this.canvas = null;
     this.config = {
       stageConfig,
@@ -11,6 +12,10 @@ class Stage {
       eraserConfig,
     };
     this.init();
+    this.zoom = stageConfig.zoom;
+    this.mouse = new Mouse();
+    this.mouse.zoom(this.canvas, this);
+    this.mouse.translation(this.canvas);
   }
 
   addImg(file) {
@@ -20,53 +25,51 @@ class Stage {
       const result = e.target.result;
       const img = new Image();
       img.src = result;
-      //   img.onload = () => {
-      // fabric.Image.fromObject(img, (obj)=>{
-      //     this.canvas.add(obj)
-      // })
-      //   };
       fabric.Image.fromObject(img, (obj) => {
-        obj.left = 100;
-        obj.top = 100;
-        console.log(0, obj);
+        obj.left = 100 * this.zoom;
+        obj.top = 100 * this.zoom;
+        obj.scaleX = this.zoom
+        obj.scaleY = this.zoom
+        // obj.width =  obj.width * this.zoom
+        // obj.height = obj.height * this.zoom
+        
         this.canvas.add(obj);
+        // obj.scale(this.zoom)
+        console.log(111,obj );
+        // this.canvas.renderAll()
         // 橡皮擦
-        this.canvas.isDrawingMode = true; // 进入绘画模式
-        this.canvas.freeDrawingBrush = new fabric.EraserBrush(this.canvas); // 使用橡皮擦画笔
-        this.canvas.freeDrawingBrush.width = 10; // 设置画笔粗细为 10
-        console.log(111, this.canvas.freeDrawingBrush);
-        this.canvas.on("erasing:start", (opt) => {
-          console.log(222, opt);
-        });
-        this.canvas.on("erasing:interaction", (opt) => {
-          console.log(333, opt);
-        });
-        this.canvas.on("erasing:end", (opt) => {
-          console.log(444, opt);
-        });
+        // this.canvas.isDrawingMode = true; // 进入绘画模式
+        // this.canvas.freeDrawingBrush = new fabric.EraserBrush(this.canvas); // 使用橡皮擦画笔
+        // this.canvas.freeDrawingBrush.width = 10; // 设置画笔粗细为 10
+        // console.log(111, this.canvas.freeDrawingBrush);
+        // this.canvas.on("erasing:start", (opt) => {
+        //   console.log(222, opt);
+        // });
+        // this.canvas.on("erasing:interaction", (opt) => {
+        //   console.log(333, opt);
+        // });
+        // this.canvas.on("erasing:end", (opt) => {
+        //   console.log(444, opt);
+        // });
         //
       });
     };
   }
-  testObj() {
-    const rect = new fabric.Rect({
-      top: 100, // 距离容器顶部 100px
-      left: -50, // 距离容器左侧 100px
-      fill: "orange", // 填充 橙色
-      width: 100, // 宽度 100px
-      height: 100, // 高度 100px
-    });
-    // 将矩形添加到画布中
-    this.canvas.add(rect);
-  }
+//   setZoom(value) {
+//     if (!value) value = this.zoom;
+//     this.canvas.setZoom(value);
+//     this.zoom = value;
+//   }
+//   getZoom() {
+//     return this.zoom;
+//   }
   init() {
-    this.canvas = new fabric.Canvas("c", {
+    if (!this.el) throw "缺少el元素";
+    this.canvas = new fabric.Canvas(this.el, {
       width: innerWidth,
       height: innerHeight - 60,
       ...stageConfig,
     });
-    this.testObj();
-    this.mouse = new Mouse(this);
   }
 }
 

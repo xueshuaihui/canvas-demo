@@ -1,6 +1,7 @@
 <template>
   <div class="toolbar">
     <div class="toolbar-item">
+      {{zoom.val}}
       <el-upload
         v-model:file-list="fileList"
         class="upload-demo"
@@ -14,15 +15,25 @@
     </div>
     <div class="toolbar-item">
       <el-tooltip
-        :content="`画布缩放:${progressValue}%`"
+        :content="`画布缩放:${zoomVal}%`"
         placement="bottom"
         effect="light"
       >
-        <input type="range" min="50" max="500" v-model="progressValue" />
+        <input
+          type="range"
+          :min="zoom.min * 100"
+          :max="zoom.max * 100"
+          v-model="zoomVal"
+        />
       </el-tooltip>
     </div>
     <div class="toolbar-item">
-      <el-icon style="margin-right: 10px" @click="handleBrush" :color="brush.active?'#409EFC': ''"><EditPen /></el-icon>
+      <el-icon
+        style="margin-right: 10px"
+        @click="handleBrush"
+        :color="brush.active ? '#409EFC' : ''"
+        ><EditPen
+      /></el-icon>
       <el-tooltip
         :content="`画笔大小:${brush.width}`"
         placement="bottom"
@@ -34,7 +45,7 @@
       <el-color-picker v-model="brush.color" show-alpha />
     </div>
     <div class="toolbar-item">
-      <el-button  type="primary" :plain="eraser.plain">橡皮</el-button>
+      <el-button type="primary" :plain="eraser.plain">橡皮</el-button>
       <el-tooltip
         :content="`橡皮大小:${eraser.width}`"
         placement="bottom"
@@ -60,10 +71,25 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, defineProps, watchEffect } from "vue";
-const emit = defineEmits(["imgUpload"]);
+import {
+  ref,
+  computed,
+  defineEmits,
+  defineProps,
+  watchEffect,
+  watch,
+} from "vue";
+const emit = defineEmits(["imgUpload", "zoomChange"]);
 const props = defineProps({
   stage: Object,
+  zoom: {
+    type: Object,
+    default: {
+      val: 1,
+      min: 0.01,
+      max: 20,
+    },
+  },
 });
 // 图片上传
 const fileList = ref([]);
@@ -72,21 +98,25 @@ const handleUpload = (rawFile) => {
   return false;
 };
 // 缩放
-const progressValue = ref(100);
-watchEffect(() => {
-  const { stage } = props;
-  if (stage) {
-    // progressValue.value = parseInt(stage.canvas.getZoom(), 10)  * 100;
-    // stage.canvas.setZoom(progressValue.value / 100) // 左上角为中心点
-    stage.canvas.zoomToPoint(
-      {
-        x: innerWidth / 2,
-        y: innerHeight / 2,
-      },
-      progressValue.value / 100
-    ); // 画布中心为中心点
+// let zoomVal = ref(props.zoom.val * 100);
+const zoomVal = computed({
+  get(){
+    return props.zoom.val * 100
+  },
+  set(val){
+    console.log(222, val);
+     emit("zoomChange", Number(val) / 100);
+        // stage.canvas.setZoom(Number(val) / 100); // 左上角为中心点
+      props.stage.canvas.zoomToPoint(
+        {
+          x: innerWidth / 2,
+          y: innerHeight / 2,
+        },
+        Number(val) / 100
+      ); // 画布中心为中心点
   }
-});
+})
+
 // 画笔
 const brush = ref({
   active: false,
@@ -95,17 +125,23 @@ const brush = ref({
 });
 // 创建画笔
 const handleBrush = () => {
-  brush.value.active = !brush.value.active
-  props.stage.canvas.isDrawingMode = brush.value.active
-  if(!props.stage.canvas.freeDrawingBrush && props.stage.canvas.isDrawingMode){
-    props.stage.canvas.freeDrawingBrush = new fabric.PencilBrush(props.stage.canvas)
+  brush.value.active = !brush.value.active;
+  props.stage.canvas.isDrawingMode = brush.value.active;
+  if (
+    !props.stage.canvas.freeDrawingBrush &&
+    props.stage.canvas.isDrawingMode
+  ) {
+    props.stage.canvas.freeDrawingBrush = new fabric.PencilBrush(
+      props.stage.canvas
+    );
   }
-}
-watchEffect(()=>{
-  if(!props.stage)return;
-  props.stage.canvas.freeDrawingBrush.color = brush.value.color
-  props.stage.canvas.freeDrawingBrush.width = parseInt(brush.value.width, 10) || 1
-})
+};
+watchEffect(() => {
+  if (!props.stage) return;
+  props.stage.canvas.freeDrawingBrush.color = brush.value.color;
+  props.stage.canvas.freeDrawingBrush.width =
+    parseInt(brush.value.width, 10) || 1;
+});
 // 橡皮擦
 const eraser = ref({
   plain: true,
