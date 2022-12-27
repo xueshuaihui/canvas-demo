@@ -71,6 +71,13 @@
         />
       </el-tooltip>
     </div>
+    <div class="toolbar-item">
+      <el-button type="primary">图层合并</el-button>
+      <el-button type="primary">图层分解</el-button>
+    </div>
+    <div class="toolbar-item">
+      <el-button type="primary">下载</el-button>
+    </div>
   </div>
 </template>
 
@@ -83,7 +90,16 @@ import {
   watchEffect,
   watch,
 } from "vue";
-const emit = defineEmits(["imgUpload", "zoomChange"]);
+const emit = defineEmits([
+  "imgUpload",
+  "zoomChange",
+  "createBrush",
+  "destoryBrush",
+  "updateBrush",
+  "createEraserBrush",
+  "updateEraserBrush",
+  "destoryEraserBrush",
+]);
 const props = defineProps({
   stage: Object,
   zoom: {
@@ -126,29 +142,28 @@ const brush = ref({
   width: 75,
   color: "rgba(255, 69, 0, 0.68)",
 });
-// 创建画笔
 const handleBrush = () => {
-  eraser.value.active  = false
+  eraser.value.active = false;
   brush.value.active = !brush.value.active;
-  props.stage.canvas.isDrawingMode = brush.value.active;
-  if (
-    !props.stage.canvas.freeDrawingBrush &&
-    props.stage.canvas.isDrawingMode
-  ) {
-    props.stage.canvas.freeDrawingBrush = new fabric.PencilBrush(
-      props.stage.canvas
-    );
+  if (brush.value.active) {
+    emit("createBrush");
+    emit("updateBrush", {
+      color: brush.value.color,
+      width: parseInt(brush.value.width, 10) || 1,
+    });
+  } else {
+    destoryBrush();
   }
 };
 const destoryBrush = () => {
-  brush.value.active = false
-  props.stage.canvas.isDrawingMode = false
-}
+  brush.value.active = false;
+  emit("destoryBrush");
+};
 watchEffect(() => {
-  if (!props.stage) return;
-  props.stage.canvas.freeDrawingBrush.color = brush.value.color;
-  props.stage.canvas.freeDrawingBrush.width =
-    parseInt(brush.value.width, 10) || 1;
+  emit("updateBrush", {
+    color: brush.value.color,
+    width: parseInt(brush.value.width, 10) || 1,
+  });
 });
 // 橡皮擦
 const eraser = ref({
@@ -156,10 +171,25 @@ const eraser = ref({
   width: 5,
   deep: 1,
 });
-const handleEraser = ()=> {
-  destoryBrush()
-  eraser.value.active  = !eraser.value.active
-}
+const handleEraser = () => {
+  destoryBrush();
+  eraser.value.active = !eraser.value.active;
+  if (eraser.value.active) {
+    emit("createEraserBrush");
+    emit("updateEraserBrush", {
+      deep: eraser.value.deep,
+      width: parseInt(eraser.value.width, 10) || 1,
+    });
+  } else {
+    emit("destoryEraserBrush");
+  }
+};
+watchEffect(() => {
+  emit("updateEraserBrush", {
+    deep: eraser.value.deep,
+    width: parseInt(eraser.value.width, 10) || 1,
+  });
+});
 </script>
 
 <style scoped>

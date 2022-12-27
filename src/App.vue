@@ -6,6 +6,12 @@
       :zoom="zoom"
       @imgUpload="handleImgUpload"
       @zoomChange="handleZoomChange"
+      @createBrush="handleCreateBrush"
+      @destoryBrush="handleDestoryBrush"
+      @updateBrush="handleUpdateBrush"
+      @createEraserBrush="handleCreateEraserBrush"
+      @destoryEraserBrush="handleDestoryEraserBrush"
+      @updateEraserBrush="handleUpdateEraserBrush"
     />
     <canvas id="c"></canvas>
   </div>
@@ -43,6 +49,34 @@ const handleZoomChange = (val) => {
     zoom.value.val = Number(val.toFixed(2));
   }
 };
+// brush
+let brush = null;
+const handleCreateBrush = () => {
+  brush = new stage.Brush();
+  brush.create(stage.canvas);
+};
+const handleDestoryBrush = () => {
+  brush?.destory(stage.canvas);
+};
+const handleUpdateBrush = (datas) => {
+  const {color, width} = datas
+  console.log(1111, color);
+  brush?.setColor(color);
+  brush?.setWidth(width);
+}
+// EraserBrush
+let eraserBrush = null
+const handleCreateEraserBrush = () => {
+  eraserBrush = new stage.EraserBrush();
+  eraserBrush.create(stage.canvas)
+}
+const handleDestoryEraserBrush = () => {
+  eraserBrush?.destory(stage.canvas)
+}
+const handleUpdateEraserBrush = (datas) => {
+  const {width, deep} = datas
+  eraserBrush?.setWidth(width)
+}
 </script>
 
 <style scoped>

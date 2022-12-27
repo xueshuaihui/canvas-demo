@@ -1,5 +1,7 @@
 import { stageConfig, zoomConfig, brushConfig, eraserConfig } from "./config";
 import Mouse from "./mouse";
+import Brush from "./brush";
+import EraserBrush from "./eraserBrush";
 import stageImage from "./image";
 class Stage {
   constructor(el) {
@@ -16,6 +18,8 @@ class Stage {
     this.zoom = stageConfig.zoom;
     this.mouse = new Mouse();
     this.mouse.init(this.canvas);
+    this.Brush = Brush
+    this.EraserBrush = EraserBrush
   }
   getAllObject(type) {
     return this.canvas.getObjects(type);
@@ -52,6 +56,7 @@ class Stage {
       imgobj.onload = () => {
         fabric.Image.fromObject(imgobj, (obj) => {
           obj.id = Math.random();
+          obj.type = 'image';
           this.setPosition(obj);
           this.canvas.add(obj);
         });
@@ -74,31 +79,8 @@ class Stage {
       this.canvas.add(obj);
 
       // this.canvas.renderAll()
-      // 橡皮擦
-      // this.canvas.isDrawingMode = true; // 进入绘画模式
-      // this.canvas.freeDrawingBrush = new fabric.EraserBrush(this.canvas); // 使用橡皮擦画笔
-      // this.canvas.freeDrawingBrush.width = 10; // 设置画笔粗细为 10
-      // console.log(111, this.canvas.freeDrawingBrush);
-      // this.canvas.on("erasing:start", (opt) => {
-      //   console.log(222, opt);
-      // });
-      // this.canvas.on("erasing:interaction", (opt) => {
-      //   console.log(333, opt);
-      // });
-      // this.canvas.on("erasing:end", (opt) => {
-      //   console.log(444, opt);
-      // });
-      //
     });
   }
-  //   setZoom(value) {
-  //     if (!value) value = this.zoom;
-  //     this.canvas.setZoom(value);
-  //     this.zoom = value;
-  //   }
-  //   getZoom() {
-  //     return this.zoom;
-  //   }
   init() {
     if (!this.el) throw "缺少el元素";
     this.canvas = new fabric.Canvas(this.el, {
@@ -111,15 +93,15 @@ class Stage {
 
 export default Stage;
 
-//
-// 2.可以上传图片，每张图片可以拖拽、放缩、旋转
+
 // 3.选择图片可以进行合并图层
 // 5.橡皮功能，可以修改橡皮大小，橡皮粒度（0-1范围，1没有用，即rgba的alpha变成1，0全部涂抹掉，即rgba的alpha变成0，0.3把图片的alpha变成0.3)
 // 7.下载图片，以图片最上端、最左端、右、下为边界下载画布上的图片
 
 /**
  * 完成：
+ * 2.可以上传图片，每张图片可以拖拽、放缩、旋转
  * 4.提供画笔功能，可以修改画笔大小、色彩
  * 1.无限画布
- *  6.基于鼠标位置为中心点的画布缩放
+ * 6.基于鼠标位置为中心点的画布缩放
  */

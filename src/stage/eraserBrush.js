@@ -1,16 +1,13 @@
-export default class Brush {
+export default class EraserBrush {
   constructor() {
     this.freeDrawingBrush = null;
   }
   create(canvas) {
     canvas.isDrawingMode = true;
     if (canvas.isDrawingMode) {
-      canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+      canvas.freeDrawingBrush = new fabric.EraserBrush(canvas); // 使用橡皮擦画笔
       this.freeDrawingBrush = canvas.freeDrawingBrush;
     }
-  }
-  setColor(value) {
-    this.freeDrawingBrush.color = value;
   }
   setWidth(value) {
     this.freeDrawingBrush.width = parseInt(value, 10) || 1;

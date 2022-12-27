@@ -7,26 +7,31 @@ export default class Mouse {
   zoom(canvas) {
     const { min, max } = zoomConfig;
     canvas.on("mouse:wheel", (opt) => {
+      if (canvas.isDrawingMode) return;
       const { target } = opt;
       let delta = opt.e.deltaY; // 滚轮向上滚一下是 -100，向下滚一下是 100
-      let zoom = canvas.getZoom(); // 获取画布当前缩放值
-
-      // 控制缩放范围在 0.01~20 的区间内
-      zoom *= 0.999 ** delta;
-      if (zoom > max) zoom = max;
-      if (zoom < min) zoom = min;
-
-      if (target) {
+      if (target && target.type === 'image') {
+        console.log(target);
+        // 获取缩放前的信息数据
         const height = target.getScaledHeight();
         const width = target.getScaledWidth();
         const zoomVal = target.getTotalObjectScaling();
-        let { scaleX, scaleY } = zoomVal;
-        scaleX = 0.9999 ** delta;
-        scaleY = 0.9999 ** delta;
-        target.scaleToWidth(width * scaleX, true);
-        target.scaleToHeight(height * scaleY, true);
+        const { scaleX, scaleY } = zoomVal;
+        let X = 0.9999 ** delta;
+        if (X > max) X = max;
+        if (X < min) X = min;
+        const Y = X;
+        // 设置缩放大小
+        target.scaleToWidth(width * X, true);
+        target.scaleToHeight(height * Y, true);
         canvas.requestRenderAll();
-      } else {
+      } else if(!target){
+        let zoom = canvas.getZoom(); // 获取画布当前缩放值
+
+        // 控制缩放范围在 0.01~20 的区间内
+        zoom *= 0.999 ** delta;
+        if (zoom > max) zoom = max;
+        if (zoom < min) zoom = min;
         // 设置画布缩放比例
         // 关键点！！！
         // 参数1：将画布的所放点设置成鼠标当前位置
