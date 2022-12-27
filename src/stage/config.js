@@ -14,3 +14,8 @@ export const stageConfig = {
     backgroundColor: "#eee",
     zoom: 0.5
 }
+// 画布元素布局配置
+// export const stageLayout = {
+//     rowLength: 20 
+
+// }

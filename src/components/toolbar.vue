@@ -1,12 +1,11 @@
 <template>
   <div class="toolbar">
     <div class="toolbar-item">
-      {{zoom.val}}
       <el-upload
         v-model:file-list="fileList"
         class="upload-demo"
         multiple
-        :limit="10"
+        :limit="100"
         :before-upload="handleUpload"
         :show-file-list="false"
       >
@@ -45,7 +44,12 @@
       <el-color-picker v-model="brush.color" show-alpha />
     </div>
     <div class="toolbar-item">
-      <el-button type="primary" :plain="eraser.plain">橡皮</el-button>
+      <el-icon
+        style="margin-right: 10px"
+        @click="handleEraser"
+        :color="eraser.active ? '#409EFC' : ''"
+        ><Notification
+      /></el-icon>
       <el-tooltip
         :content="`橡皮大小:${eraser.width}`"
         placement="bottom"
@@ -100,22 +104,21 @@ const handleUpload = (rawFile) => {
 // 缩放
 // let zoomVal = ref(props.zoom.val * 100);
 const zoomVal = computed({
-  get(){
-    return props.zoom.val * 100
+  get() {
+    return props.zoom.val * 100;
   },
-  set(val){
-    console.log(222, val);
-     emit("zoomChange", Number(val) / 100);
-        // stage.canvas.setZoom(Number(val) / 100); // 左上角为中心点
-      props.stage.canvas.zoomToPoint(
-        {
-          x: innerWidth / 2,
-          y: innerHeight / 2,
-        },
-        Number(val) / 100
-      ); // 画布中心为中心点
-  }
-})
+  set(val) {
+    emit("zoomChange", Number(val) / 100);
+    // stage.canvas.setZoom(Number(val) / 100); // 左上角为中心点
+    props.stage.canvas.zoomToPoint(
+      {
+        x: innerWidth / 2,
+        y: innerHeight / 2,
+      },
+      Number(val) / 100
+    ); // 画布中心为中心点
+  },
+});
 
 // 画笔
 const brush = ref({
@@ -125,6 +128,7 @@ const brush = ref({
 });
 // 创建画笔
 const handleBrush = () => {
+  eraser.value.active  = false
   brush.value.active = !brush.value.active;
   props.stage.canvas.isDrawingMode = brush.value.active;
   if (
@@ -136,6 +140,10 @@ const handleBrush = () => {
     );
   }
 };
+const destoryBrush = () => {
+  brush.value.active = false
+  props.stage.canvas.isDrawingMode = false
+}
 watchEffect(() => {
   if (!props.stage) return;
   props.stage.canvas.freeDrawingBrush.color = brush.value.color;
@@ -144,10 +152,14 @@ watchEffect(() => {
 });
 // 橡皮擦
 const eraser = ref({
-  plain: true,
+  active: false,
   width: 5,
   deep: 1,
 });
+const handleEraser = ()=> {
+  destoryBrush()
+  eraser.value.active  = !eraser.value.active
+}
 </script>
 
 <style scoped>

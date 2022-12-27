@@ -39,7 +39,6 @@ let zoom = ref({
   min: 0.01,
 });
 const handleZoomChange = (val) => {
-  console.log(111, val);
   if (typeof val === "number") {
     zoom.value.val = Number(val.toFixed(2));
   }
