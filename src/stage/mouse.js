@@ -1,9 +1,19 @@
 import { zoomConfig } from "./config";
-
+/**
+ * 鼠标功能
+ * 缩放、平移
+ *
+ * @class
+ */
 export default class Mouse {
   constructor() {
     this.zoomConfig = zoomConfig;
   }
+  /**
+   * 缩放
+   *
+   * @param {object} canvas 当前画布对象
+   */
   zoom(canvas) {
     const { min, max } = zoomConfig;
     canvas.on("mouse:wheel", (opt) => {
@@ -48,6 +58,11 @@ export default class Mouse {
       }
     });
   }
+  /**
+   * 平移
+   *
+   * @param {object} canvas 当前画布对象
+   */
   translation(canvas) {
     canvas.on("mouse:down", (opt) => {
       if (canvas.isDrawingMode || canvas.selection) return;

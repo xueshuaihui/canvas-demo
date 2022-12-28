@@ -115,7 +115,6 @@ const emit = defineEmits([
   "download",
 ]);
 const props = defineProps({
-  stage: Object,
   zoom: {
     type: Object,
     default: {
@@ -125,13 +124,29 @@ const props = defineProps({
     },
   },
 });
-// 图片上传
+/**
+ * 本地上传的数据
+ *
+ * @const
+ * @type {ref}
+ */
 const fileList = ref([]);
+/**
+ * 上传时触发回调
+ *
+ * @param {Object} rawFile file对象的上传数据
+ * @return {boolean} 是否终止后续操作
+ */
 const handleUpload = (rawFile) => {
   emit("imgUpload", rawFile);
   return false;
 };
-// 缩放
+/**
+ * 缩放比例
+ *
+ * @const
+ * @type {computed}
+ */
 // let zoomVal = ref(props.zoom.val * 100);
 const zoomVal = computed({
   get() {
@@ -142,25 +157,38 @@ const zoomVal = computed({
   },
 });
 
-// 画笔
+/**
+ * 画笔基础数据
+ *
+ * @const
+ * @type {ref}
+ */
 const brush = ref({
   active: false,
   width: 75,
   color: "rgba(255, 69, 0, 0.68)",
 });
+/**
+ * 点击工具栏画笔icon触发
+ */
 const handleBrush = () => {
   eraser.value.active = false;
   brush.value.active = !brush.value.active;
   if (brush.value.active) {
+    // 创建、更新画笔数据
     emit("createBrush");
     emit("updateBrush", {
       color: brush.value.color,
       width: parseInt(brush.value.width, 10) || 1,
     });
   } else {
+    // 销毁画笔
     destoryBrush();
   }
 };
+/**
+ * 销毁画笔统一方法
+ */
 const destoryBrush = () => {
   brush.value.active = false;
   emit("destoryBrush");
@@ -171,22 +199,32 @@ watchEffect(() => {
     width: parseInt(brush.value.width, 10) || 1,
   });
 });
-// 橡皮擦
+/**
+ * 橡皮擦基础数据
+ *
+ * @const
+ * @type {ref}
+ */
 const eraser = ref({
   active: false,
   width: 5,
   deep: 1,
 });
+/**
+ * 点击工具栏橡皮擦icon触发
+ */
 const handleEraser = () => {
   destoryBrush();
   eraser.value.active = !eraser.value.active;
   if (eraser.value.active) {
+    // 创建、更新
     emit("createEraserBrush");
     emit("updateEraserBrush", {
       deep: eraser.value.deep,
       width: parseInt(eraser.value.width, 10) || 1,
     });
   } else {
+    // 销毁
     emit("destoryEraserBrush");
   }
 };
@@ -196,7 +234,12 @@ watchEffect(() => {
     width: parseInt(eraser.value.width, 10) || 1,
   });
 });
-// 框选功能
+/**
+ * 框选能力是否启用
+ *
+ * @const
+ * @type {ref}
+ */
 const selectionFlag = ref(false);
 </script>
 

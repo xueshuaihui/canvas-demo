@@ -3,6 +3,7 @@ export default class Group {
   /**
    *新建分组
    *
+   * @param {Object} canvas 当前画布对象
    * @param {Object} opts 组配置参数
    * @return {Object} 返回的group对象
    */

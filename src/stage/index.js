@@ -6,6 +6,13 @@ import stageImage from "./image";
 import Group from "./group";
 
 import _ from "lodash";
+
+/**
+ * 画布类
+ * 基础功能以及子类
+ *
+ * @class
+ */
 class Stage {
   constructor(el) {
     this.el = el;
@@ -25,14 +32,24 @@ class Stage {
     this.EraserBrush = EraserBrush;
     this.Group = Group;
   }
+  /**
+   * 获取画布上所有对象元素
+   *
+   * @param {[string]} type 类型
+   * @return {[object]} 画布上的所有元素
+   */
   getAllObject(type) {
     return this.canvas.getObjects(type);
   }
+  /**
+   * 元素设置位置相关信息
+   * 新上传图片相对最后(上传顺序)一个元素右移
+   * 位置计算有需要后期创新优化 @xuesh
+   *
+   * @param {object} obj 画布元素
+   */
   setPosition(obj) {
-    /**
-     * 设置位置相关信息
-     * 新上传图片相对最后一个元素右移
-     */
+    // 获取最后一个上传的元素的位置数据
     const AllObject = this.getAllObject();
     const length = AllObject.length;
     let left = 0,
@@ -44,6 +61,7 @@ class Stage {
       width = lastObj.width * this.zoom;
       top = lastObj.top;
     }
+    // 更新位置信息
     obj.left = left + width;
     obj.top = top;
     obj.scaleX = this.zoom;
@@ -51,12 +69,19 @@ class Stage {
     obj.width = obj.width;
     obj.height = obj.height;
   }
+  /**
+   * 画布添加元素，渲染图片
+   *
+   * @param {object} file 待上传的file数据
+   */
   addImg(file) {
+    // 读取图片数据
     var reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = (e) => {
       const imgobj = new Image();
       imgobj.onload = () => {
+        // 画布加载、渲染
         fabric.Image.fromObject(imgobj, (obj) => {
           obj.id = Math.random();
           obj.type = "image";
@@ -67,7 +92,11 @@ class Stage {
       imgobj.src = e.target.result;
     };
   }
-
+/**
+ * 下载画布
+ *
+ * @param {string} type 可以下载的图片格式
+ */
   outputImg(type) {
     type = type || "jpeg";
     // 通过偏移量、宽高处理全图
@@ -85,22 +114,20 @@ class Stage {
     const mintopObj = _.minBy(all, (o) => {
       return o.top;
     });
-    console.log(
-      111,
-      minleftObj,
-      minleftObj.left, mintopObj, mintopObj.top
-    );
+    // 剪切画布， 输出画布数据base64格式
+    // console.log(111, minleftObj, minleftObj.left, mintopObj, mintopObj.top);
     const baseimg = this.canvas.toDataURL({
       format: type,
       quality: 1,
       // multiplier: this.zoom,
       withoutTransform: true,
       left: minleftObj.getBoundingRect().left,
-      top: mintopObj.getBoundingRect().top ,
+      top: mintopObj.getBoundingRect().top,
       width: (maxleftObj.left - minleftObj.left + maxleftObj.width) * this.zoom,
       height: (maxtopObj.top - mintopObj.top + mintopObj.height) * this.zoom,
     });
     this.canvas.requestRenderAll();
+    // 下载功能
     let a = document.createElement("a");
     a.setAttribute("href", baseimg);
     a.setAttribute("download", `${Date.parse(new Date())}.${type}`);
@@ -129,21 +156,3 @@ class Stage {
 }
 
 export default Stage;
-
-// 3.选择图片可以进行合并图层
-//
-
-/**
- * 完成：
- * 7.下载图片，以图片最上端、最左端、右、下为边界下载画布上的图片
- * 2.可以上传图片，每张图片可以拖拽、放缩、旋转
- * 4.提供画笔功能，可以修改画笔大小、色彩
- * 1.无限画布
- * 6.基于鼠标位置为中心点的画布缩放
- * 5.橡皮功能，可以修改橡皮大小，橡皮粒度（0-1范围，1没有用，即rgba的alpha变成1，0全部涂抹掉，即rgba的alpha变成0，0.3把图片的alpha变成0.3)
- */
-
-/**
- * 不完善：
- * 5.橡皮功能： 橡皮粒度（0-1范围，1没有用，即rgba的alpha变成1，0全部涂抹掉，即rgba的alpha变成0，0.3把图片的alpha变成0.3)
- */
