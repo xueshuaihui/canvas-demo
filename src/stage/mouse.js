@@ -11,7 +11,6 @@ export default class Mouse {
       const { target } = opt;
       let delta = opt.e.deltaY; // 滚轮向上滚一下是 -100，向下滚一下是 100
       if (target && target.type === 'image') {
-        console.log(target);
         // 获取缩放前的信息数据
         const height = target.getScaledHeight();
         const width = target.getScaledWidth();
@@ -51,7 +50,7 @@ export default class Mouse {
   }
   translation(canvas) {
     canvas.on("mouse:down", (opt) => {
-      if (canvas.isDrawingMode) return;
+      if (canvas.isDrawingMode || canvas.selection) return;
       // 鼠标按下时触发
       if (!opt.target) {
         let evt = opt.e;

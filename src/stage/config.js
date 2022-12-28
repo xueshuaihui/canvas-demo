@@ -12,7 +12,7 @@ export const eraserConfig = {
 export const stageConfig = {
     selection: false,
     backgroundColor: "#eee",
-    zoom: 0.5
+    zoom: 1
 }
 // 画布元素布局配置
 // export const stageLayout = {

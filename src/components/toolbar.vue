@@ -72,11 +72,21 @@
       </el-tooltip>
     </div>
     <div class="toolbar-item">
-      <el-button type="primary">图层合并</el-button>
-      <el-button type="primary">图层分解</el-button>
+      <el-button
+        type="primary"
+        @click="
+          selectionFlag = !selectionFlag;
+          emit('selectionSwitch', selectionFlag);
+        "
+        >{{ selectionFlag ? "关闭" : "开启" }}框选</el-button
+      >
     </div>
     <div class="toolbar-item">
-      <el-button type="primary">下载</el-button>
+      <el-button type="primary" @click="emit('createGroup')">图层合并</el-button>
+      <el-button type="primary" @click="emit('dispersedGroup')">图层分解</el-button>
+    </div>
+    <div class="toolbar-item">
+      <el-button type="primary" @click="emit('download')">下载</el-button>
     </div>
   </div>
 </template>
@@ -99,6 +109,10 @@ const emit = defineEmits([
   "createEraserBrush",
   "updateEraserBrush",
   "destoryEraserBrush",
+  "selectionSwitch",
+  "createGroup",
+  "dispersedGroup",
+  "download",
 ]);
 const props = defineProps({
   stage: Object,
@@ -125,14 +139,6 @@ const zoomVal = computed({
   },
   set(val) {
     emit("zoomChange", Number(val) / 100);
-    // stage.canvas.setZoom(Number(val) / 100); // 左上角为中心点
-    props.stage.canvas.zoomToPoint(
-      {
-        x: innerWidth / 2,
-        y: innerHeight / 2,
-      },
-      Number(val) / 100
-    ); // 画布中心为中心点
   },
 });
 
@@ -190,6 +196,8 @@ watchEffect(() => {
     width: parseInt(eraser.value.width, 10) || 1,
   });
 });
+// 框选功能
+const selectionFlag = ref(false);
 </script>
 
 <style scoped>
