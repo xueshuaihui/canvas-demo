@@ -50,7 +50,10 @@ class Stage {
    */
   setPosition(obj) {
     // 获取最后一个上传的元素的位置数据
-    const AllObject = this.getAllObject();
+    const AllObject = this.getAllObject({
+      type: 'image'
+    });
+    console.log(333, AllObject);
     const length = AllObject.length;
     let left = 0,
       width = 0,
@@ -86,17 +89,38 @@ class Stage {
           obj.id = Math.random();
           obj.type = "image";
           this.setPosition(obj);
-          this.canvas.add(obj);
+          // this.canvas.add(obj);
+
+          //
+          obj.clone((obj1) => {
+            obj1.id = Math.random();
+            obj1.type = "copyImage";
+            obj1.opacity = 0.3;
+            obj1.set("erasable", false);
+            // this.canvas.add(obj1);
+
+            //
+            const group = new fabric.Group(
+              [obj, obj1],
+              {
+                erasable: "deep"
+                // top: 50, // 整组距离顶部100
+                // left: 100, // 整组距离左侧100
+                // angle: -10, // 整组旋转-10deg
+              },
+            );
+            this.canvas.add(group);
+          });
         });
       };
       imgobj.src = e.target.result;
     };
   }
-/**
- * 下载画布
- *
- * @param {string} type 可以下载的图片格式
- */
+  /**
+   * 下载画布
+   *
+   * @param {string} type 可以下载的图片格式
+   */
   outputImg(type) {
     type = type || "jpeg";
     // 通过偏移量、宽高处理全图
